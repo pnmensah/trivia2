@@ -12,3 +12,4 @@ pytz
 six
 SQLAlchemy
 Werkzeug
+python-dotenv
