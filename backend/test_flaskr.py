@@ -101,6 +101,27 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['created'])
 
+    def test_405_create_question(self):
+        res=self.client().post('/questions/1000', json = self.new_question)
+        data=json.loads(res.data)
+
+        self.assertEqual(res.status_code, 405)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'method not allowed')
+
+    def test_500_get_quiz_questions(self):
+        res=self.client().post('/quizzes', json = {
+            'previous_questions': [],
+        })
+        data=json.loads(res.data)
+
+        self.assertEqual(res.status_code, 500)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'server error')
+
+        res=self.client().delete('/questions/1000')
+        data=json.loads(res.data)
+
     def test_search_questions(self):
         res=self.client().post('/search', json = self.search)
         data=json.loads(res.data)
@@ -180,15 +201,13 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'resource not found')
     
-    def test_422_if_search_term_is_empty(self):
-        res=self.client().post('/search', json = {
-            'searchTerm': ''
-        })
+    def test_404_if_search_fails(self):
+        res=self.client().post('/search', json = {})
         data=json.loads(res.data)
 
-        self.assertEqual(res.status_code, 422)
+        self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], 'unprocessable')
+        self.assertEqual(data['message'], 'resource not found')
 
 
     # Make the tests conveniently executable
